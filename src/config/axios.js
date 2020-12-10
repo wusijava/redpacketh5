@@ -1,7 +1,7 @@
 import axios from 'axios'
 
- const baseURL = 'http://ws-api.ngrok.zanclick.cn/h5/v1/'
-//const baseURL = 'http://47.114.76.55/api/h5/v1/'
+ //const baseURL = 'http://ws-api.ngrok.zanclick.cn/h5/v1/'
+const baseURL = 'http:///172.16.4.187:8884/h5'
 
 function setHeaders() {
     const header = {}

@@ -1,6 +1,9 @@
 const method = {
     user:{
         login: '/login',
+        register: '/register',
+        exit: '/logout',
+        change:'/api/change'
     },
     area:{
         list: '/area/areaList'
@@ -38,11 +41,17 @@ const method = {
         getPage: 'rebateUser/getPage',
         getStoreInfo: '/rebateUser/getStoreInfo',
         submitInformation: '/rebateUser/insertRebateUser',
-        selectReceiver: '/rebate/selectReceiver',
-        queryRedPacket: '/rebate/getReceiverList',
+        selectReceiver: '/api/queryRedPacket',
+        queryRedPacket: '/getRedPacketList',
         getRebateRecord: '/rebate/getRebateRecord',
         changeUser: '/rebateUser/handoverRebateUser',
-        getRedPacket: '/rebate/getRebate'
+        getRedPacket: '/api/getRedPacket',
+        batchRedPacket: '/api/batchRedPacket'
     },
+    wallet:{
+        getWallet: '/api/getWallet',
+        changeAccount: '/api/changeAccount',
+        transfer: '/api/transfer'
+    }
 }
 export default method;

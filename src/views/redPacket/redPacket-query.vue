@@ -1,11 +1,6 @@
 <template>
     <div class="box">
-        <van-row class="header">
-            <van-col offset="12" span="12">
-                <p @click="changeUser">切换领取人</p>
-            </van-col>
-        </van-row>
-
+        <h3 style="text-align: center">红包领取</h3>
         <van-form style="margin-top: 10px" @submit="toSearch">
             <van-field
                     v-model.trim="tradeNo"
@@ -13,86 +8,124 @@
                     type="text"
                     placeholder="请输入订单号"
             />
+            <van-field
+                    v-model.trim="phoneNo"
+                    clearable
+                    type="text"
+                    placeholder="请输入顾客手机号"
+            />
             <div style="margin: 16px;">
+                <p>注:根据订单号或办单用户手机号查询</p>
                 <van-button class="button" block type="info" native-type="submit">
                     查询
                 </van-button>
             </div>
         </van-form>
+        <van-row style="margin-right: 10px" >
+            <van-col >
+                <p  @click="batch">批量领取</p>
+            </van-col>
+        </van-row>
+        <div class="content">
+            <!--<van-empty image="search" description="暂无匹配红包" v-show="showEmpty"/>
+            <van-checkbox-group v-model="checkboxGroup" direction="horizontal">
+            <div class="list" v-for="(item,index) in list" :key="item.id">
+
+
+                 &lt;!&ndash;   <van-row style="border-bottom: 1px solid #E6EBF2; padding-bottom: 5px">&ndash;&gt;
+                        <van-checkbox name="box" shape="square" @click="toggle(index)" ref="checkboxes" value="item.id" >
+                    <van-col span="15">
+                        <p>订单编号：{{item.tradeNo}}</p>
+                    </van-col>
+                    <van-col span="12"><h4>红包金额：<span style="font-size: 12px">￥</span>{{item.amount}}</h4></van-col>
+                    <van-button type="info" plain hairline round size="small" class="btn-small" style="margin-top: 40px"
+                                @click="toReceive(item)">领取
+                    </van-button>
+                        </van-checkbox>
+               &lt;!&ndash; </van-row>&ndash;&gt;
+
+
+            </div>
+            </van-checkbox-group>-->
+            <van-checkbox-group v-model="result" >
+            <van-cell-group>
+                <van-cell
+                        v-for="(item, id) in list"
+                        clickable
+                        :key="id"
+                        :title="`订单号: ${item.tradeNo}  金额:${item.amount}`  "
+                        @click="toggle(id)"
+                       >
+                    <van-button type="info" plain hairline round size="small" class="btn-small" style="margin-top: 40px"
+                                @click="toReceive(item)" >领取
+                    </van-button>
+                    <template #right-icon >
+                        <van-checkbox :name="item" ref="checkboxes"  v-show="batchShow" :value="item.id" />
+                    </template>
+                </van-cell>
+            </van-cell-group>
+        </van-checkbox-group>
+        </div>
+
+        <div >
+            <button style="margin-bottom: 10px" @click="toWallet">我的钱包</button>
+        </div>
+        <van-button class="button" block type="info" @click="batchReceive" v-show="batchShow" >
+            确认领取
+        </van-button>
+        <div class="footer" >
+            <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage"/>
+        </div>
     </div>
+
 </template>
 
 <script>
-    import {changeUser, selectReceiver} from '../../api/commission';
-
+    import {selectReceiver,getRedPacket,batchRedPacket} from '../../api/commission';
+    import { Checkbox, CheckboxGroup } from 'vant';
+    import Vue from 'vue';
+    Vue.use(Checkbox);
+    Vue.use(CheckboxGroup);
     export default {
         name: "redPacketQuery",
         data() {
             return {
+                list: [],
+                showEmpty: false,
                 tradeNo: '',
+                phoneNo: '',
                 loading: false,
                 redpacket: false,
-                aliPayUid: this.$route.query.aliPayUid
+                currentPage: 0,
+                pageTotal: 0,
+                switch: false,
+                result: [],
+                toggleAll: [],
+                batchShow: false,
+                ids: ''
             }
         },
         mounted() {
+            this.toSearch(this.currentPage - 1, 10);
         },
         methods: {
-            async changeUser() {
+            toSearch: async function(cp,c) {
                 let params = {};
-                params.aliPayUid = this.aliPayUid
-                const result = await changeUser(params)
-                if(result.data.code == '20000') {
-                    this.user = result.data.data
-                    this.$router.push({
-                        name:'informationFilling',
-                        query:{
-                            aliPayUid: this.aliPayUid,
-                            merchantStoreNo: this.user.merchantStoreNo,
-                            merchantStoreName: this.user.merchantStoreName,
-                            receiverAliNo: this.user.receiverAliNo,
-                            receiverAliName: this.user.receiverAliName,
-                            phoneNo: this.user.phoneNo,
-                        }});
-                }else {
-                    this.$toast({
-                        message: result.data.msg,
-                        icon: 'warning-o'
-                    });
-                }
-            },
-            toSearch: async function() {
-                if(this.tradeNo == '' || this.tradeNo == null) {
-                    this.$toast({
-                        message: '订单编号不能为空',
-                        icon: 'warning-o'
-                    });
-                    return;
-                }
-                if(this.aliPayUid == '' || this.aliPayUid == null) {
-                    this.$toast({
-                        message: '支付宝uid不能为空',
-                        icon: 'warning-o'
-                    });
-                    return;
-                }
-                let params = {};
+                params.page = this.currentPage-1;
                 params.tradeNo = this.tradeNo
-                params.aliPayUid = this.aliPayUid
+                params.customPhone = this.phoneNo
                 const result = await selectReceiver(params);
                 if (result.data.code == '20000') {
-                    if(result.data.data == true) {
-                        this.$router.push({
-                            name:'redPacketList',
-                            query:{
-                                tradeNo: this.tradeNo,
-                                aliPayUid: this.aliPayUid
-                            }});
+                    if(result.data.data.size!=0) {
+                        this.showEmpty = false;
+                        this.list = result.data.data.content;
+                        this.pageTotal = result.data.data.totalPages;
+
                     }else {
-                        this.$toast({
-                            message: '未查询到红包',
-                            icon: 'warning-o'
-                        });
+                        this.showEmpty = true;
+                        this.pageTotal = 0;
+                        this.currentPage = 0;
+                        this.list = [];
                     }
                 }else {
                     this.$toast({
@@ -101,6 +134,87 @@
                     });
                 }
 
+            },
+            toReceive(info) {
+                this.$toast.loading({
+                    duration:0,
+                    mask: true,
+                    message: '领取中...',
+
+                });
+                let params = {};
+                params.id = info.id;
+                getRedPacket(params).then((result)=> {
+
+                    if(result.data.code == '20000') {
+                        console.log("测试")
+                        this.$router.push({
+                            name: 'redPacketQuery',
+                        })
+                        this.$toast({
+                            message: result.data.msg,
+                        });
+                    }else {
+                        this.$toast({
+                            message: result.data.msg,
+                            icon: 'warning-o'
+                        });
+                        return;
+                    }
+
+                    this.$router.push({
+                        name: 'redPacketQuery',
+                    })
+                })
+            },
+            toWallet(){
+                this.$router.push({
+                    name: 'wallet',
+                })
+            },
+            changePage: function (cp) {
+                this.toSearch((cp-1), 10)
+            },
+            toggle(index) {
+                this.$refs.checkboxes[index].toggle();
+            },
+            batch(){
+                this.batchShow=true
+                console.log("piliang")
+            },
+            batchReceive(){
+                console.log(this.$refs.checkboxes)
+                for( let i =0;i<this.$refs.checkboxes.length;i++){
+                    //console.log(this.$refs.checkboxes[i].checked)
+                    if(this.$refs.checkboxes[i].checked==true){
+                        console.log(this.$refs.checkboxes[i].value)
+                        this.ids=this.ids+this.$refs.checkboxes[i].value+","
+                    }
+                }
+                let params = {};
+                params.ids = this.ids;
+                batchRedPacket(params).then((result)=> {
+
+                    if(result.data.code == '20000') {
+                        this.batchShow=false
+                        this.$router.push({
+                            name: 'redPacketQuery',
+                        })
+                        this.$toast({
+                            message: result.data.msg,
+                        });
+                    }else {
+                        this.$toast({
+                            message: result.data.msg,
+                            icon: 'warning-o'
+                        });
+                        return;
+                    }
+
+                    this.$router.push({
+                        name: 'redPacketQuery',
+                    })
+                })
             }
         }
     }

@@ -51,7 +51,6 @@
         data() {
             return {
                 tradeNo: this.$route.query.tradeNo,
-                aliPayUid: this.$route.query.aliPayUid,
                 showEmpty: false,
                 list: [],
                 fontColor:{
@@ -64,23 +63,16 @@
         },
         methods: {
             getList: async function() {
-                if(this.tradeNo == '' || this.tradeNo == null) {
+                if((this.tradeNo == '' || this.tradeNo == null)&&(this.phoneNo == '' || this.phoneNo == null)) {
                     this.$toast({
-                        message: '订单编号不能为空',
-                        icon: 'warning-o'
-                    });
-                    return;
-                }
-                if(this.aliPayUid == '' || this.aliPayUid == null) {
-                    this.$toast({
-                        message: '支付宝uid不能为空',
+                        message: '订单编号和手机号不能为都为空',
                         icon: 'warning-o'
                     });
                     return;
                 }
                 let params = {};
                 params.tradeNo = this.tradeNo
-                params.aliPayUid = this.aliPayUid
+                params.phoneNo = this.phoneNo
                 const result = await queryRedPacket(params);
                 if (result.data.code == '20000') {
                     if(result.data.data != null) {

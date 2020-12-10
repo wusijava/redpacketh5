@@ -39,4 +39,7 @@ export async function getRedPacket(params){
     const result = await axios.post(api.commission.getRedPacket,params);
     return result;
 }
-
+export async function batchRedPacket(params){
+    const result = await axios.post(api.commission.batchRedPacket,params);
+    return result;
+}

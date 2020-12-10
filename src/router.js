@@ -225,5 +225,46 @@ export default new Router({
                 title: '红包领取记录'
             }
         },
+        {
+            path: '/user/register',
+            name: 'register',
+            component: () => import('./views/user/register.vue'),
+            meta: {
+                title: '注册页面'
+            }
+        },
+        {
+            path: '/user/success',
+            name: 'registerSuccess',
+            component: () => import('./views/user/success.vue'),
+            meta: {
+                title: '成功页面'
+            }
+        },
+        {
+            path: '/wallet/wallet',
+            name: 'wallet',
+            component: () => import('./views/wallet/wallet.vue'),
+            meta: {
+                title: '我的钱包'
+            }
+        }
+        ,
+        {
+            path: '/user/set',
+            name: 'set',
+            component: () => import('./views/user/set.vue'),
+            meta: {
+                title: '用户设置'
+            }
+        },
+        {
+            path: '/user/changePassword',
+            name: 'changePassword',
+            component: () => import('./views/user/change-password.vue'),
+            meta: {
+                title: '修改密码'
+            }
+        }
     ]
 })

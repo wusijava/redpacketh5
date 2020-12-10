@@ -1,91 +1,81 @@
 <template>
     <div class="box">
         <div class="content">
-            <h3>红包领取平台</h3>
-            <van-form @submit="toLogin" class="login">
+            <h3>修改密码</h3>
+            <van-form @submit="change" class="login">
                 <van-field
-                        v-model="username"
+                        v-model="oldPassword"
                         name="账号"
-                        placeholder="请输入账号"
+                        placeholder="请输入旧密码"
                         clearable
                 />
-                <div v-if="ifDisplay">
+                <div>
                     <van-field
                             v-model="password"
                             type="text"
                             name="密码"
-                            placeholder="请输入密码"
+                            placeholder="请输入新密码"
+                            clearable
+                    />
+                </div>
+                <div >
+                    <van-field
+                            v-model="passwordConfirm"
+                            type="text"
+                            name="密码"
+                            placeholder="请确认新密码"
                             clearable
                     />
                     <span class="eyes-open" @click="ifDisplay = !ifDisplay">
-                        <img src="../../src/assets/img/btn_key_visible@2x.png"/>
-                    </span>
-                </div>
-                <div v-else>
-                    <van-field
-                            v-model="password"
-                            type="password"
-                            name="密码"
-                            placeholder="请输入密码"
-                            clearable
-                    />
-                    <span class="eyes-closed" @click="ifDisplay = !ifDisplay">
-                        <img src="../../src/assets/img/btn_key_disvisible@2x.png"/>
                     </span>
                 </div>
                 <div style="margin: 25px 16px;">
                     <van-button round block type="info" native-type="submit">
-                        登录
+                        保存
                     </van-button>
 
                 </div>
 
             </van-form>
-            <div style="margin-left: 210px;" @click="register">
-                <van-button round >
-                    注册账号
-                </van-button>
-            </div>
         </div>
 
     </div>
 </template>
 
 <script>
-    import {login} from '../api/user'
+    import {change} from '../../api/user'
 
     export default {
-        name: 'login',
+        name: 'changePassword',
         data() {
             return {
-                username: '',
+                oldPassword: '',
                 password: '',
-                ifDisplay: false,
-                infoShow: false
+                passwordConfirm: ''
             }
         },
         mounted() {
-            let token = localStorage.getItem('login_token');
-            if(token){
-                this.$router.push({name:'redPacketQuery'})
-            }
+
         },
         methods: {
-            toLogin() {
-                if(this.username == '' || this.password == '') {
+            change(){
+                if(this.oldPassword == '' || this.password == ''||this.passwordConfirm =='') {
                     this.infoShow = true
                     this.$dialog.alert({
-                        message:'用户名密码不能为空',
+                        message:'信息不完整!',
                     })
-                } else{
+                }else{
                     let query = new Object()
-                    query.username = this.username
+                    query.oldPassword = this.oldPassword
                     query.password = this.password
-                    login(query).then(json =>{
+                    query.passwordConfirm = this.passwordConfirm
+                    change(query).then(json =>{
                         if(json.data.code === '20000') {
-
-                            localStorage.setItem('login_token', json.headers.authorization);
-                            this.$router.push({name:'redPacketQuery'})
+                            this.$dialog.alert({
+                                message:'修改成功,请重新登录!',
+                            })
+                            localStorage.removeItem('login_token');
+                            this.$router.push({name:'login'})
                         }else {
                             this.infoShow = true
                             this.$dialog.alert({
@@ -94,9 +84,8 @@
                         }
                     })
                 }
-            },
-            register(){
-                this.$router.push({name:'register'})
+
+                console.log(345)
             }
         }
     }
