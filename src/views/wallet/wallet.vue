@@ -16,19 +16,37 @@
             <h3 style="text-align: center">修改提现账号</h3>
             <van-field label="支付宝账号"  v-model="account" />
             <van-field label="支付宝实名"  v-model="name" />
-            <van-button type="info" @click="cancle">取消</van-button><van-button type="info"  @click="sub">确定</van-button>
+            <van-button type="info" @click="cancle" size="mini">取消</van-button><van-button type="info"  @click="sub" size="mini">确定</van-button>
         </van-cell-group></van-popup>
         <van-popup v-model="showGetMoney"><van-cell-group v-show="showGetMoney" round="true">
             <h3 style="text-align: center">红包提现</h3>
             <van-field label="提现金额"  v-model="money" />
             <van-button type="info" @click="cancleMoney">取消</van-button><van-button type="info"  @click="subGetMoney">确定</van-button>
         </van-cell-group></van-popup>
+        <van-button type="info" @click="receiveList()">领取明细</van-button><van-button type="info" @click="getTransferList()">提现明细</van-button>
+        <div class="content">
+            <div class="list" v-for="(item,index) in list" :key="item.id">
 
+
+                    <van-row style="border-bottom: 1px solid #E6EBF2; padding-bottom: 5px">
+                    <van-col >
+                        <p>订单编号：{{item.tradeNo}} 领取时间:{{item.createTime}}</p>
+                    </van-col>
+                    <van-col span="12"><h4>红包金额：<span style="font-size: 12px">￥</span>{{item.amount}}  {{item.settleDesc}}  {{item.receiveNo}}</h4></van-col>
+
+                </van-row>
+
+
+            </div>
+        </div>
+        <div class="footer" >
+            <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage" />
+        </div>
     </div>
 </template>
 
 <script>
-    import {getWallet,changeAccount,transfer} from '../../api/wallet'
+    import {getWallet,changeAccount,transfer,getReceiveList} from '../../api/wallet'
     import { Notify } from 'vant';
     export default {
         name: "wallet",
@@ -43,11 +61,16 @@
                 name: '',
                 account: '',
                 showGetMoney: false,
-                money: ''
+                money: '',
+                list: [],
+                currentPage: 0,
+                pageTotal: 0,
+                type: 1
             }
         },
         mounted() {
             this.getInfo();
+            this.getReceiveList(this.currentPage - 1, 10);
         },
         methods: {
             userSet(){
@@ -136,6 +159,36 @@
                     }
                     this.$toast.clear();
                 })
+            },
+            getReceiveList(cp,c){
+                let params = {};
+                params.page = this.currentPage-1;
+                params.type=this.type
+                getReceiveList(params).then((result)=> {
+                    if(result.data.code == '20000') {
+                        this.list = result.data.data.content;
+                        this.pageTotal = result.data.data.totalPages;
+                    }else {
+                        this.$toast({
+                            message: result.data.msg,
+                            icon: 'warning-o'
+                        });
+                        return;
+                    }
+                })
+            },
+            changePage: function (cp) {
+                this.getReceiveList((cp-1), 10)
+            },
+            getTransferList(cp){
+                this.currentPage=1
+                this.type=2
+                this.getReceiveList((cp-1), 10)
+            },
+            receiveList(cp){
+                this.currentPage=1
+                this.type=1
+                this.getReceiveList((cp-1), 10)
             }
         }
     }

@@ -51,7 +51,8 @@ const method = {
     wallet:{
         getWallet: '/api/getWallet',
         changeAccount: '/api/changeAccount',
-        transfer: '/api/transfer'
+        transfer: '/api/transfer',
+        getReceiveList: '/api/getReceiveList'
     }
 }
 export default method;

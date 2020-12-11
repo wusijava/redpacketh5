@@ -23,7 +23,7 @@
         </van-form>
         <van-row style="margin-right: 10px" >
             <van-col >
-                <p  @click="batch">批量领取</p>
+                <p  @click="batch" v-show="batchButtonShow">批量领取</p><p  @click="batchChoose" v-show="allChoose">全选</p><p  @click="cancelBatchChoose" v-show="cancelAllChoose">取消全选</p>
             </van-col>
         </van-row>
         <div class="content">
@@ -47,7 +47,8 @@
 
             </div>
             </van-checkbox-group>-->
-            <van-checkbox-group v-model="result" >
+            <van-empty image="search" description="暂无匹配红包" v-show="showEmpty"/>
+            <van-checkbox-group v-model="result" ref="checkboxGroup">
             <van-cell-group>
                 <van-cell
                         v-for="(item, id) in list"
@@ -74,7 +75,7 @@
             确认领取
         </van-button>
         <div class="footer" >
-            <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage"/>
+            <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage" v-show="batchButtonShow"/>
         </div>
     </div>
 
@@ -102,7 +103,10 @@
                 result: [],
                 toggleAll: [],
                 batchShow: false,
-                ids: ''
+                ids: '',
+                batchButtonShow :false,
+                allChoose: false,
+                cancelAllChoose: false
             }
         },
         mounted() {
@@ -119,6 +123,13 @@
                     if(result.data.data.size!=0) {
                         this.showEmpty = false;
                         this.list = result.data.data.content;
+                        console.log(this.list.length)
+                        if(this.list.length>1){
+                            this.batchButtonShow=true
+                        }else{
+                            this.showEmpty = true
+                            this.batchButtonShow=false
+                        }
                         this.pageTotal = result.data.data.totalPages;
 
                     }else {
@@ -145,9 +156,7 @@
                 let params = {};
                 params.id = info.id;
                 getRedPacket(params).then((result)=> {
-
                     if(result.data.code == '20000') {
-                        console.log("测试")
                         this.$router.push({
                             name: 'redPacketQuery',
                         })
@@ -161,10 +170,15 @@
                         });
                         return;
                     }
-
                     this.$router.push({
                         name: 'redPacketQuery',
                     })
+                    this.batchShow=false
+                    this.allChoose=false
+                    this.cancelAllChoose=false
+                    //this.batchButtonShow=false
+                    /*刷新无效?*/
+                    location.reload()
                 })
             },
             toWallet(){
@@ -180,7 +194,8 @@
             },
             batch(){
                 this.batchShow=true
-                console.log("piliang")
+                this.allChoose=true
+                this.cancelAllChoose=true
             },
             batchReceive(){
                 console.log(this.$refs.checkboxes)
@@ -197,9 +212,13 @@
 
                     if(result.data.code == '20000') {
                         this.batchShow=false
+                        this.allChoose=false
+                        this.cancelAllChoose=false
+                        this.batchButtonShow=false
                         this.$router.push({
                             name: 'redPacketQuery',
                         })
+                        this.toSearch(this.currentPage - 1, 10);
                         this.$toast({
                             message: result.data.msg,
                         });
@@ -210,11 +229,17 @@
                         });
                         return;
                     }
-
+                    this.toSearch(this.currentPage - 1, 10);
                     this.$router.push({
                         name: 'redPacketQuery',
                     })
                 })
+            },
+            batchChoose(){
+                this.$refs.checkboxGroup.toggleAll(true)
+            },
+            cancelBatchChoose(){
+                this.$refs.checkboxGroup.toggleAll(false)
             }
         }
     }
