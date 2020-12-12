@@ -16,10 +16,10 @@ const compress = new CompressionWebpackPlugin(
     }
 );
 module.exports = {
-    publicPath:'/h5',
+    publicPath:'/',
     productionSourceMap: process.env.NODE_ENV === 'production' ? false : true,
     devServer: {
-        port: 8082,
+        port: 8022,
         before:(app, server)=> {
             app.get(/.*.(js)$/, (req, res, next) => {
                 if(req.url.indexOf('hot-update')>=0){

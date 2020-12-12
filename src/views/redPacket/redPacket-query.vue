@@ -75,7 +75,7 @@
             确认领取
         </van-button>
         <div class="footer" >
-            <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage" v-show="batchButtonShow"/>
+            <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage" v-show="pageButton"/>
         </div>
     </div>
 
@@ -106,7 +106,8 @@
                 ids: '',
                 batchButtonShow :false,
                 allChoose: false,
-                cancelAllChoose: false
+                cancelAllChoose: false,
+                pageButton: false
             }
         },
         mounted() {
@@ -121,9 +122,9 @@
                 const result = await selectReceiver(params);
                 if (result.data.code == '20000') {
                     if(result.data.data.size!=0) {
+                        this.pageButton=true
                         this.showEmpty = false;
                         this.list = result.data.data.content;
-                        console.log(this.list.length)
                         if(this.list.length>1){
                             this.batchButtonShow=true
                         }else{

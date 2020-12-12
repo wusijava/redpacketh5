@@ -67,7 +67,7 @@
         mounted() {
             let token = localStorage.getItem('login_token');
             if(token){
-                this.$router.push({name:'redPacketQuery'})
+                //this.$router.push({name:'redPacketQuery'})
             }
         },
         methods: {

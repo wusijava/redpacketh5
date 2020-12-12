@@ -143,7 +143,6 @@
                         mask: true,
                         message: '领取中...',
                     });
-                    console.log(json)
                     if(json.data.code === '20000') {
 
                         Notify({ type: 'success', message: json.data.msg });
