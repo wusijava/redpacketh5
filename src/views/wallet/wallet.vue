@@ -1,5 +1,9 @@
 <template>
     <div class="box">
+        <van-notice-bar
+                left-icon="volume-o"
+                text="使用过程中,遇到任何问题,请联系开发人员:tomcat,联系电话:13813813838"
+        />
         <van-row style="margin-right: 10px" >
             <van-col >
                 <p  @click="userSet">设置</p>
@@ -8,31 +12,31 @@
         <div class="main">
             <h3>我的钱包</h3>
         </div>
-        <div style="border: 1px solid grey"> <p style="margin-left: 10px"><b>总金额:{{item.totalAmount}}</b></p>
-            <p style="margin-left: 10px" ><b>可提现金额:{{item.canWithdrawAmount}}</b> <button style="margin-left: 100px;" @click="getMoney">提现</button></p>
-            <p style="margin-left: 10px"><b>提现账户:{{item.receiveNo}}  </b><button style="margin-left: 80px" @click="changeAccount">更改账户</button></p>
+        <div style="border: 1px solid  deepskyblue ;margin-bottom: 10px;border-radius: 10px" > <p style="margin-left: 10px"><b>总金额:{{item.totalAmount}}</b></p>
+            <p style="margin-left: 10px" ><b>可提现金额:{{item.canWithdrawAmount}}</b> <van-button style="margin-left: 100px;" @click="getMoney" type="primary">提现</van-button></p>
+            <p style="margin-left: 10px"><b>提现账户:{{item.receiveNo}}  </b><van-button style="margin-left: 80px" @click="changeAccount" type="primary">更改账户</van-button></p>
         </div>
         <van-popup v-model="showDig"><van-cell-group v-show="showDig" round="true">
             <h3 style="text-align: center">修改提现账号</h3>
-            <van-field label="支付宝账号"  v-model="account" />
-            <van-field label="支付宝实名"  v-model="name" />
-            <van-button type="info" @click="cancle" size="mini">取消</van-button><van-button type="info"  @click="sub" size="mini">确定</van-button>
+            <van-field label="支付宝账号:"  v-model="account" />
+            <van-field label="支付宝实名:"  v-model="name" />
+            <van-button type="info" @click="cancle" size="mini" style="margin-left: 20px;margin-right: 70px;margin-bottom: 10px">取消</van-button><van-button type="info"  @click="sub" size="mini">确定</van-button>
         </van-cell-group></van-popup>
         <van-popup v-model="showGetMoney"><van-cell-group v-show="showGetMoney" round="true">
             <h3 style="text-align: center">红包提现</h3>
             <van-field label="提现金额"  v-model="money" />
-            <van-button type="info" @click="cancleMoney">取消</van-button><van-button type="info"  @click="subGetMoney">确定</van-button>
+            <van-button type="info" @click="cancleMoney" style="margin-right: 50px;margin-left: 20px;margin-bottom: 10px">取消</van-button><van-button type="info"  @click="subGetMoney" >确定</van-button>
         </van-cell-group></van-popup>
-        <van-button type="info" @click="receiveList()">领取明细</van-button><van-button type="info" @click="getTransferList()">提现明细</van-button>
-        <div class="content">
-            <div class="list" v-for="(item,index) in list" :key="item.id">
+        <van-button type="info" @click="receiveList()" style="margin-right: 180px">领取明细</van-button><van-button type="info" @click="getTransferList()">提现明细</van-button>
+        <div class="content" style="border-radius: 10px;border: #3385ff solid 1px;margin-top: 10px">
+            <div class="list" v-for="(item,index) in list" :key="item.id" >
 
 
                     <van-row style="border-bottom: 1px solid #E6EBF2; padding-bottom: 5px">
                     <van-col >
-                        <p>订单编号：{{item.tradeNo}} 领取时间:{{item.createTime}}</p>
+                        <p>领取时间:{{item.createTime}}</p>
                     </van-col>
-                    <van-col span="12"><h4>红包金额：<span style="font-size: 12px">￥</span>{{item.amount}}  {{item.settleDesc}}  {{item.receiveNo}}</h4></van-col>
+                    <van-col span="12" style="width: 400px"><h4>红包金额：<span style="font-size: 8px">￥</span>{{item.amount}}  {{item.settleDesc}}  {{item.receiveNo}}</h4></van-col>
 
                 </van-row>
 

@@ -1,6 +1,9 @@
 <template>
     <div class="box">
-        <h3 style="text-align: center">红包领取</h3>
+        <van-notice-bar
+                left-icon="volume-o"
+                text="使用过程中,遇到任何问题,请联系开发人员:tomcat,联系电话:13813813838"
+        />
         <van-form style="margin-top: 10px" @submit="toSearch">
             <van-field
                     v-model.trim="tradeNo"
@@ -15,7 +18,6 @@
                     placeholder="请输入顾客手机号"
             />
             <div style="margin: 16px;">
-                <p>注:根据订单号或办单用户手机号查询</p>
                 <van-button class="button" block type="info" native-type="submit">
                     查询
                 </van-button>
@@ -23,10 +25,10 @@
         </van-form>
         <van-row style="margin-right: 10px" >
             <van-col >
-                <p  @click="batch" v-show="batchButtonShow">批量领取</p><p  @click="batchChoose" v-show="allChoose">全选</p><p  @click="cancelBatchChoose" v-show="cancelAllChoose">取消全选</p>
+                <span  @click="batch" v-show="batchButtonShow">批量领取</span><span  @click="batchChoose" v-show="allChoose" style="margin-left: 20px">全选</span><span  @click="cancelBatchChoose" v-show="cancelAllChoose" style="margin-left: 20px">取消全选</span><span  @click="closeAll"  v-show="closeAllShow" style="margin-left: 20px">关闭全选</span>
             </van-col>
         </van-row>
-        <div class="content">
+        <div class="content" style="height: 280px">
             <!--<van-empty image="search" description="暂无匹配红包" v-show="showEmpty"/>
             <van-checkbox-group v-model="checkboxGroup" direction="horizontal">
             <div class="list" v-for="(item,index) in list" :key="item.id">
@@ -47,17 +49,17 @@
 
             </div>
             </van-checkbox-group>-->
-            <van-empty image="search" description="暂无匹配红包" v-show="showEmpty"/>
+            <!--<van-empty image="search" description="暂无匹配红包" v-show="showEmpty"/>-->
             <van-checkbox-group v-model="result" ref="checkboxGroup">
             <van-cell-group>
                 <van-cell
                         v-for="(item, id) in list"
                         clickable
                         :key="id"
-                        :title="`订单号: ${item.tradeNo}  金额:${item.amount}`  "
+                        :title="`序号: ${item.id}       金额:${item.amount}`  "
                         @click="toggle(id)"
                        >
-                    <van-button type="info" plain hairline round size="small" class="btn-small" style="margin-top: 40px"
+                    <van-button type="info" plain hairline round size="small" class="btn-small" style="margin-right: 5px"
                                 @click="toReceive(item)" >领取
                     </van-button>
                     <template #right-icon >
@@ -68,15 +70,21 @@
         </van-checkbox-group>
         </div>
 
-        <div >
+       <!-- <div >
             <button style="margin-bottom: 10px" @click="toWallet">我的钱包</button>
-        </div>
+        </div>-->
         <van-button class="button" block type="info" @click="batchReceive" v-show="batchShow" >
             确认领取
         </van-button>
         <div class="footer" >
             <van-pagination  v-model="currentPage" :page-count="pageTotal" mode="simple" @change="changePage" v-show="pageButton"/>
         </div>
+        <van-tabbar v-model="active">
+            <van-tabbar-item icon="home-o" @click="toWallet">我的钱包</van-tabbar-item>
+           <!-- <van-tabbar-item icon="search">我的钱包</van-tabbar-item>
+            <van-tabbar-item icon="friends-o">标签</van-tabbar-item>
+            <van-tabbar-item icon="setting-o">标签</van-tabbar-item>-->
+        </van-tabbar>
     </div>
 
 </template>
@@ -87,10 +95,15 @@
     import Vue from 'vue';
     Vue.use(Checkbox);
     Vue.use(CheckboxGroup);
+    import { Tabbar, TabbarItem } from 'vant';
+    Vue.use(Tabbar);
+    Vue.use(TabbarItem);
     export default {
         name: "redPacketQuery",
         data() {
             return {
+                closeAllShow: false,
+                active: '',
                 list: [],
                 showEmpty: false,
                 tradeNo: '',
@@ -120,12 +133,14 @@
                 params.tradeNo = this.tradeNo
                 params.customPhone = this.phoneNo
                 const result = await selectReceiver(params);
+                console.log(result)
                 if (result.data.code == '20000') {
                     if(result.data.data.size!=0) {
                         this.pageButton=true
                         this.showEmpty = false;
                         this.list = result.data.data.content;
                         if(this.list.length>1){
+                            this.closeAllShow=true
                             this.batchButtonShow=true
                         }else{
                             this.showEmpty = true
@@ -241,6 +256,11 @@
             },
             cancelBatchChoose(){
                 this.$refs.checkboxGroup.toggleAll(false)
+            },
+            closeAll(){
+                this.batchShow=false
+                this.cancelAllChoose=false
+                this.allChoose=false
             }
         }
     }

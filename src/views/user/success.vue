@@ -30,7 +30,7 @@
                 merchantNo:null,
                 merchantPwd: null,
                 img:require('@/assets/img/icon_complete@2x.png'),
-                qr:require('@/assets/img/xieyi.png'),
+                qr:require('@/assets/img/logo.png'),
                 one:require('@/assets/img/img_one@2x.png'),
                 two:require('@/assets/img/img_two@2x.png'),
             }

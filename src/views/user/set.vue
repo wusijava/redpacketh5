@@ -1,5 +1,9 @@
 <template>
     <div class="box">
+        <van-notice-bar
+                left-icon="volume-o"
+                text="使用过程中,遇到任何问题,请联系开发人员:tomcat,联系电话:13813813838"
+        />
         <div class="content">
             <h3>设置</h3>
             <van-form class="login">
@@ -19,6 +23,12 @@
                 <div style="margin: 25px 16px;">
                     <van-button round block type="info" @click="back">
                         返回钱包
+                    </van-button>
+
+                </div>
+                <div style="margin: 25px 16px;">
+                    <van-button round block type="info" @click="query">
+                        红包查询
                     </van-button>
 
                 </div>
@@ -63,6 +73,9 @@
                     });
                     return;
                 }
+            },
+            query(){
+                this.$router.push({name:'redPacketQuery'})
             }
         }
     }

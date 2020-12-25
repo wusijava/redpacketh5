@@ -41,8 +41,8 @@
                 </div>
 
             </van-form>
-            <div style="margin-left: 210px;" @click="register">
-                <van-button round >
+            <div style="margin: 25px 16px;" @click="register">
+                <van-button type="info" size="large" round >
                     注册账号
                 </van-button>
             </div>
